@@ -69,6 +69,19 @@ int main()
 	gpgme_verify_result_t result = gpgme_op_verify_result(ctx);
 	if (result == NULL)
 		std::cout << "verify error" << std::endl;
+	else
+	{
+		gpgme_signature_t sig = result->signatures;
+		if (!sig)
+			std::cout << "sig verification error" << std::endl;
+		for (; sig; sig = sig->next) {
+			if ((sig->summary & GPGME_SIGSUM_VALID) ||  // Valid
+				(sig->summary & GPGME_SIGSUM_GREEN) ||  // Valid
+				(sig->summary == 0 && sig->status == GPG_ERR_NO_ERROR)) // Valid but key is not certified with a trusted signature
+				std::cout << "SIGNATURE OK" << std::endl;
+		}
+	}
+
 
 
 	// free
