@@ -25,10 +25,10 @@
 
 int main()
 {
-	gpgme_ctx_t ceofcontext = NULL;
+	gpgme_ctx_t ctx = NULL;
 	gpgme_error_t ec;
 
-	ec = gpgme_new(&ceofcontext);
+	ec = gpgme_new(&ctx);
 
 	gpgme_data_t data_file = NULL;
 	int dataFileDescriptor = open("test.txt", O_RDONLY);
@@ -42,10 +42,35 @@ int main()
 	ec = gpgme_data_new_from_fd(&sig_file, sigFileDescriptor);
 	std::cout << "error " << ec << std::endl;
 
+	// import key
+	gpgme_data_t pub_key = NULL;
+	int pub_key_desc = open("key.pub", O_RDONLY);
+	std::cout << "pub_key_desc " << pub_key_desc << std::endl;
+	ec = gpgme_data_new_from_fd(&pub_key, pub_key_desc);
+	std::cout << "error " << ec << std::endl;
+
+	ec = gpgme_op_import(ctx, pub_key);
+
+	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
+	ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
+	std::cout << "error " << ec << std::endl;
+	if (ec == GPG_ERR_INV_VALUE)
+		std::cout << "GPG_ERR_INV_VALUE" << std::endl;
+	else if (ec == GPG_ERR_NO_DATA)
+		std::cout << "GPG_ERR_NO_DATA" << std::endl;
+
+	gpgme_verify_result_t result = gpgme_op_verify_result(ctx);
+	if (result == NULL)
+		std::cout << "verify error" << std::endl;
+	else
+		std::cout << "verify ok" << std::endl;
+
+
 	// free
 	gpgme_data_release(data_file);
 	gpgme_data_release(sig_file);
-	gpgme_release(ceofcontext);
+	gpgme_data_release(pub_key);
+	gpgme_release(ctx);
 
 	return 0;
 }
