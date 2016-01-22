@@ -25,6 +25,27 @@
 
 int main()
 {
+	gpgme_ctx_t ceofcontext = NULL;
+	gpgme_error_t ec;
+
+	ec = gpgme_new(&ceofcontext);
+
+	gpgme_data_t data_file = NULL;
+	int dataFileDescriptor = open("test.txt", O_RDONLY);
+	std::cout << "dataFileDescriptor " << dataFileDescriptor << std::endl;
+	ec = gpgme_data_new_from_fd(&data_file, dataFileDescriptor);
+	std::cout << "error " << ec << std::endl;
+
+	gpgme_data_t sig_file = NULL;
+	int sigFileDescriptor = open("test.txt.sig", O_RDONLY);
+	std::cout << "sigFileDescriptor " << sigFileDescriptor << std::endl;
+	ec = gpgme_data_new_from_fd(&sig_file, sigFileDescriptor);
+	std::cout << "error " << ec << std::endl;
+
+	// free
+	gpgme_data_release(data_file);
+	gpgme_data_release(sig_file);
+	gpgme_release(ceofcontext);
 
 	return 0;
 }
@@ -40,6 +61,7 @@ int main3()
    gpgme_data_t data;
 
    gpgme_engine_info_t enginfo;
+
 
 
    /* The function `gpgme_check_version' must be called before any other
