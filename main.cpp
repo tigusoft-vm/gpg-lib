@@ -28,6 +28,9 @@ int main()
 	gpgme_ctx_t ctx = NULL;
 	gpgme_error_t ec;
 
+	char *p = (char *) gpgme_check_version(NULL);
+	std::cout << "version " << p << std::endl;
+
 	ec = gpgme_new(&ctx);
 
 	gpgme_data_t data_file = NULL;
@@ -50,6 +53,7 @@ int main()
 	std::cout << "error " << ec << std::endl;
 
 	ec = gpgme_op_import(ctx, pub_key);
+	gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
 
 	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
 	ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
@@ -62,8 +66,6 @@ int main()
 	gpgme_verify_result_t result = gpgme_op_verify_result(ctx);
 	if (result == NULL)
 		std::cout << "verify error" << std::endl;
-	else
-		std::cout << "verify ok" << std::endl;
 
 
 	// free
