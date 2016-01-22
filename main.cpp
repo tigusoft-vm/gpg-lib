@@ -28,13 +28,13 @@ int main()
 	gpgme_ctx_t ctx = NULL;
 	gpgme_error_t ec;
 
-	//gpgme_check_version(NULL); // mem leak
+	gpgme_check_version("");
 
 	ec = gpgme_new(&ctx);
 
 	/* set protocol to use in our context */
-	//ec = gpgme_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP);
-	//std::cout << "error " << ec << std::endl;
+	ec = gpgme_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP);
+	std::cout << "error " << ec << std::endl;
 
 	gpgme_data_t data_file = NULL;
 	int dataFileDescriptor = open("test.txt", O_RDONLY);
