@@ -32,6 +32,7 @@ int main()
 	gpgme_check_version("");
 
 	ec = gpgme_new(&ctx);
+	dbg("error " << ec);
 
 	/* set protocol to use in our context */
 	ec = gpgme_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP);
