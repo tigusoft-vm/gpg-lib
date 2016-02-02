@@ -22,6 +22,7 @@
 
 /* USE -D_FILE_OFFSET_BITS=64 (at least) on Debian!  */
 
+#define dbg(X) std::cout << __LINE__ << ": " << X << std::endl
 
 int main()
 {
@@ -34,51 +35,51 @@ int main()
 
 	/* set protocol to use in our context */
 	ec = gpgme_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP);
-	std::cout << "error " << ec << std::endl;
+	dbg("error " << ec);
 
 	gpgme_data_t data_file = NULL;
 	int dataFileDescriptor = open("test.txt", O_RDONLY);
-	std::cout << "dataFileDescriptor " << dataFileDescriptor << std::endl;
+	dbg("dataFileDescriptor " << dataFileDescriptor);
 	ec = gpgme_data_new_from_fd(&data_file, dataFileDescriptor);
-	std::cout << "error " << ec << std::endl;
+	dbg("error " << ec);
 
 	gpgme_data_t sig_file = NULL;
 	int sigFileDescriptor = open("test.txt.sig", O_RDONLY);
-	std::cout << "sigFileDescriptor " << sigFileDescriptor << std::endl;
+	dbg("sigFileDescriptor " << sigFileDescriptor);
 	ec = gpgme_data_new_from_fd(&sig_file, sigFileDescriptor);
-	std::cout << "error " << ec << std::endl;
+	dbg("error " << ec);
 
 	// import key
 	gpgme_data_t pub_key = NULL;
 	int pub_key_desc = open("key.pub", O_RDONLY);
-	std::cout << "pub_key_desc " << pub_key_desc << std::endl;
+	dbg("pub_key_desc " << pub_key_desc);
 	ec = gpgme_data_new_from_fd(&pub_key, pub_key_desc);
-	std::cout << "error " << ec << std::endl;
+	dbg("error " << ec);
 
 	ec = gpgme_op_import(ctx, pub_key);
 	gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
 
 	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
 	ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
-	std::cout << "error " << ec << std::endl;
+	dbg("error " << ec);
 	if (ec == GPG_ERR_INV_VALUE)
-		std::cout << "GPG_ERR_INV_VALUE" << std::endl;
+		dbg("GPG_ERR_INV_VALUE");
 	else if (ec == GPG_ERR_NO_DATA)
-		std::cout << "GPG_ERR_NO_DATA" << std::endl;
+		dbg("GPG_ERR_NO_DATA");
 
 	gpgme_verify_result_t result = gpgme_op_verify_result(ctx);
 	if (result == NULL)
-		std::cout << "verify error" << std::endl;
+		dbg("verify error");
 	else
 	{
 		gpgme_signature_t sig = result->signatures;
 		if (!sig)
-			std::cout << "sig verification error" << std::endl;
+			dbg("sig verification error");
 		for (; sig; sig = sig->next) {
 			if ((sig->summary & GPGME_SIGSUM_VALID) ||  // Valid
 				(sig->summary & GPGME_SIGSUM_GREEN) ||  // Valid
 				(sig->summary == 0 && sig->status == GPG_ERR_NO_ERROR)) // Valid but key is not certified with a trusted signature
-				std::cout << "SIGNATURE OK" << std::endl;
+				dbg("SIGNATURE OK");
 		}
 	}
 
