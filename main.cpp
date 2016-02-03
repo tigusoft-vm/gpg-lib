@@ -111,19 +111,44 @@ int main()
 		dbg("verify error");
 	else
 	{
+		//gpgme_get_sig_status(ctx, );
 		gpgme_signature_t sig = result->signatures;
 		if (!sig)
 			dbg("sig verification error");
 		for (; sig; sig = sig->next) {
-			if ((sig->summary & GPGME_SIGSUM_VALID) ||  // Valid
-				(sig->summary & GPGME_SIGSUM_GREEN))  // Valid
+			if ((sig->summary & GPGME_SIGSUM_VALID) || (sig->summary & GPGME_SIGSUM_GREEN))  // Valid
 			{
 				dbg("SIGNATURE OK");
 			}
+			else if (sig->summary & GPGME_SIGSUM_RED)
+				dbg("GPGME_SIGSUM_RED");
 			else if (sig->summary == 0 && sig->status == GPG_ERR_NO_ERROR) // Valid but key is not certified with a trusted signature
 				dbg("SIGNATURE OK but key is not certified with a trusted signature");
 			else
+			{
 				dbg("SIGNATURE NOT OK, ec: " << ec);
+				dbg("sig->summary: " << sig->summary);
+			}
+
+
+			if (sig->summary & GPGME_SIGSUM_VALID)
+				dbg("GPGME_SIGSUM_VALID");
+			if (sig->summary & GPGME_SIGSUM_KEY_REVOKED)
+				dbg("GPGME_SIGSUM_KEY_REVOKED");
+			if (sig->summary & GPGME_SIGSUM_KEY_EXPIRED)
+				dbg("GPGME_SIGSUM_KEY_EXPIRED");
+			if (sig->summary & GPGME_SIGSUM_SIG_EXPIRED)
+				dbg("GPGME_SIGSUM_SIG_EXPIRED");
+			if (sig->summary & GPGME_SIGSUM_KEY_MISSING)
+				dbg("GPGME_SIGSUM_KEY_MISSING");
+//			if (sig->summary & GPGME_SIGSUM_CRL_MISSING)
+//				dbg("GPGME_SIGSUM_CRL_MISSING")
+			if (sig->summary & GPGME_SIGSUM_CRL_TOO_OLD)
+				dbg("GPGME_SIGSUM_CRL_TOO_OLD");
+			if (sig->summary & GPGME_SIGSUM_BAD_POLICY)
+				dbg("GPGME_SIGSUM_BAD_POLICY");
+			if (sig->summary & GPGME_SIGSUM_SYS_ERROR)
+				dbg("GPGME_SIGSUM_SYS_ERROR");
 
 		}
 	}
