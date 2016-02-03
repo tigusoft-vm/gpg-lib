@@ -24,12 +24,37 @@
 
 #define dbg(X) std::cout << __LINE__ << ": " << X << std::endl
 
+
+bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
+	dbg("load_public_key start");
+	gpgme_set_armor(ctx, 1); // XXX
+	gpgme_error_t ec;
+	gpgme_data_t data_file = NULL;
+	int dataFileDescriptor = open(key_filename.c_str(), O_RDONLY);
+	ec = gpgme_data_new_from_fd(&data_file, dataFileDescriptor);
+	dbg("error " << ec);
+
+	ec = gpgme_op_import(ctx, data_file);
+	dbg("error: " << ec);
+
+	gpgme_data_release(data_file);
+
+	gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
+	dbg("improt result");
+	dbg("imported " << key_import_result->imported);
+
+	dbg("load_public_key end");
+	return true;
+}
+
 int main()
 {
 	gpgme_ctx_t ctx = NULL;
 	gpgme_error_t ec;
 
-	gpgme_check_version("");
+	setlocale (LC_ALL, "");
+	gpgme_set_locale(NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
+	gpgme_check_version(NULL);
 
 	ec = gpgme_new(&ctx);
 	dbg("error " << ec);
@@ -37,6 +62,10 @@ int main()
 	/* set protocol to use in our context */
 	ec = gpgme_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP);
 	dbg("error " << ec);
+
+	//ec = gpgme_ctx_set_engine_info (ctx, GPGME_PROTOCOL_OpenPGP,
+    //           "/usr/bin/gpg","/home/robert/.gnupg/");
+	//dbg("error " << ec);
 
 	gpgme_data_t data_file = NULL;
 	int dataFileDescriptor = open("test.txt", O_RDONLY);
@@ -51,14 +80,8 @@ int main()
 	dbg("error " << ec);
 
 	// import key
-	gpgme_data_t pub_key = NULL;
-	int pub_key_desc = open("key.pub", O_RDONLY);
-	dbg("pub_key_desc " << pub_key_desc);
-	ec = gpgme_data_new_from_fd(&pub_key, pub_key_desc);
-	dbg("error " << ec);
-
-	ec = gpgme_op_import(ctx, pub_key);
-	gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
+	load_public_key("key.pub", ctx);
+	//gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
 
 	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
 	ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
@@ -68,6 +91,7 @@ int main()
 	else if (ec == GPG_ERR_NO_DATA)
 		dbg("GPG_ERR_NO_DATA");
 
+	dbg("verify start");
 	gpgme_verify_result_t result = gpgme_op_verify_result(ctx);
 	if (result == NULL)
 		dbg("verify error");
@@ -78,18 +102,23 @@ int main()
 			dbg("sig verification error");
 		for (; sig; sig = sig->next) {
 			if ((sig->summary & GPGME_SIGSUM_VALID) ||  // Valid
-				(sig->summary & GPGME_SIGSUM_GREEN) ||  // Valid
-				(sig->summary == 0 && sig->status == GPG_ERR_NO_ERROR)) // Valid but key is not certified with a trusted signature
+				(sig->summary & GPGME_SIGSUM_GREEN))  // Valid
+			{
 				dbg("SIGNATURE OK");
+			}
+			else if (sig->summary == 0 && sig->status == GPG_ERR_NO_ERROR) // Valid but key is not certified with a trusted signature
+				dbg("SIGNATURE OK but key is not certified with a trusted signature");
+			else
+				dbg("SIGNATURE NOT OK, ec: " << ec);
+
 		}
 	}
 
 
-
+	dbg("verify end, free data");
 	// free
 	gpgme_data_release(data_file);
 	gpgme_data_release(sig_file);
-	gpgme_data_release(pub_key);
 	gpgme_release(ctx);
 
 	return 0;
