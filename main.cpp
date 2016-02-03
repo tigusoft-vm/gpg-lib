@@ -27,7 +27,7 @@
 
 bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
 	dbg("load_public_key start");
-	gpgme_set_armor(ctx, 1); // XXX
+	//gpgme_set_armor(ctx, 1); // XXX
 	gpgme_error_t ec;
 	gpgme_data_t data_file = NULL;
 	int dataFileDescriptor = open(key_filename.c_str(), O_RDONLY);
@@ -39,9 +39,22 @@ bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
 
 	gpgme_data_release(data_file);
 
+	dbg("**************************");
 	gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
-	dbg("improt result");
-	dbg("imported " << key_import_result->imported);
+	dbg("considered " << key_import_result->considered);
+	dbg("no_user_id " << key_import_result->no_user_id);
+	dbg("imported_rsa " << key_import_result->imported_rsa);
+	dbg("unchanged " << key_import_result->unchanged);
+	dbg("new_user_ids " << key_import_result->new_user_ids);
+	dbg("new_sub_keys " << key_import_result->new_sub_keys);
+	dbg("new_signatures " << key_import_result->new_signatures);
+	dbg("new_revocations " << key_import_result->new_revocations);
+	dbg("secret_read " << key_import_result->secret_read);
+	dbg("secret_imported " << key_import_result->secret_imported);
+	dbg("secret_unchanged " << key_import_result->secret_unchanged);
+	dbg("not_imported " << key_import_result->not_imported);
+
+	dbg("**************************");
 
 	dbg("load_public_key end");
 	return true;
@@ -55,6 +68,8 @@ int main()
 	setlocale (LC_ALL, "");
 	gpgme_set_locale(NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
 	gpgme_check_version(NULL);
+	ec = gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP);
+	dbg("error " << ec);
 
 	ec = gpgme_new(&ctx);
 	dbg("error " << ec);
@@ -81,7 +96,6 @@ int main()
 
 	// import key
 	load_public_key("key.pub", ctx);
-	//gpgme_import_result_t key_import_result = gpgme_op_import_result(ctx);
 
 	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
 	ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
