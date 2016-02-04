@@ -110,8 +110,8 @@ int main()
 	load_public_key("key.pub", ctx);
 
 	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
-	//ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
-	ec = gpgme_op_verify(ctx, sig_file_not_detach, nullptr, out_file);
+	ec = gpgme_op_verify(ctx, sig_file, data_file, nullptr);
+	//ec = gpgme_op_verify(ctx, sig_file_not_detach, nullptr, out_file); // <=== OK
 	dbg("error " << ec);
 	if (ec == GPG_ERR_INV_VALUE)
 		dbg("GPG_ERR_INV_VALUE");
