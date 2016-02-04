@@ -94,11 +94,24 @@ int main()
 	ec = gpgme_data_new_from_fd(&sig_file, sigFileDescriptor);
 	dbg("error " << ec);
 
+	gpgme_data_t sig_file_not_detach = NULL;
+	sigFileDescriptor = open("test-not-detach.txt.sig", O_RDONLY);
+	dbg("sigFileDescriptor " << sigFileDescriptor);
+	ec = gpgme_data_new_from_fd(&sig_file_not_detach, sigFileDescriptor);
+	dbg("error " << ec);
+
+	gpgme_data_t out_file = NULL;
+	sigFileDescriptor = open("out_file", O_RDWR);
+	dbg("sigFileDescriptor " << sigFileDescriptor);
+	ec = gpgme_data_new_from_fd(&out_file, sigFileDescriptor);
+	dbg("error " << ec);
+
 	// import key
 	load_public_key("key.pub", ctx);
 
 	//ec = gpgme_op_verify_start(ctx, sig_file, nullptr, data_file);
-	ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
+	//ec = gpgme_op_verify(ctx, sig_file, nullptr, data_file);
+	ec = gpgme_op_verify(ctx, sig_file_not_detach, nullptr, out_file);
 	dbg("error " << ec);
 	if (ec == GPG_ERR_INV_VALUE)
 		dbg("GPG_ERR_INV_VALUE");
@@ -150,6 +163,9 @@ int main()
 			if (sig->summary & GPGME_SIGSUM_SYS_ERROR)
 				dbg("GPGME_SIGSUM_SYS_ERROR");
 
+			dbg("sig->status " << sig->status);
+			dbg("fpr: " << sig->fpr);
+			dbg("reason " << sig->validity_reason);
 		}
 	}
 
