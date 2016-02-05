@@ -14,17 +14,25 @@ c_gpgme::c_gpgme() {
 	assert(m_ctx != nullptr);
 }
 
-gpgme_data_t c_gpgme::load_file ( const std::string &filename ) {
-	gpgme_data_t data_file = nullptr;
-#ifdef __linux__
-	int file_descriptor = open(filename.c_str(), O_RDONLY); // TODO
+
+std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> c_gpgme::load_file ( const std::string &filename ) {
+	auto deleter = [](gpgme_data_t *ptr) {
+		gpgme_data_release(*ptr);
+		delete ptr;
+	};
+
+	std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> data_file_ptr(new gpgme_data_t, deleter);
+#ifdef __linux__ // TODO windows
+	int file_descriptor = open(filename.c_str(), O_RDONLY);
 	if (file_descriptor == -1) {
 		throw std::runtime_error(std::string("cannot open file ") + filename);
 	}
 #endif
-	m_error_code = gpgme_data_new_from_fd(&data_file, file_descriptor);
-	
-	return data_file;
+	m_error_code = gpgme_data_new_from_fd(data_file_ptr.get(), file_descriptor);
+	if (m_error_code) {
+		throw std::runtime_error(std::string("load file error, error code ") + std::to_string(m_error_code));
+	}
+	return data_file_ptr;
 }
 
 

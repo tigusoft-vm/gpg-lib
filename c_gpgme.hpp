@@ -2,6 +2,7 @@
 #define C_GPGME_H
 
 #include <gpgme.h>
+#include <memory>
 #include <string>
 
 class c_gpgme
@@ -29,7 +30,9 @@ class c_gpgme
 		gpgme_ctx_t m_ctx = nullptr;
 		gpgme_error_t m_error_code;
 
-		gpgme_data_t load_file(const std::string &filename);
+		void release_data_t(gpgme_data_t *ptr);
+		std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> load_file(const std::string &filename);
+
 };
 
 #endif // C_GPGME_H
