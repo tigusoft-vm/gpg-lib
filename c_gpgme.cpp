@@ -15,12 +15,36 @@ c_gpgme::c_gpgme() {
 }
 
 
+bool c_gpgme::verify_detached_signature ( const std::string &sig_file, const std::string &clear_data_file ) {
+	try {
+		auto sig_file_ptr = load_file(sig_file);
+		auto clear_data_file_ptr = load_file(clear_data_file);
+		m_error_code = gpgme_op_verify(m_ctx, *sig_file_ptr, *clear_data_file_ptr, nullptr);
+		if (m_error_code) return false;
+		gpgme_verify_result_t result = gpgme_op_verify_result(m_ctx);
+		if (result == nullptr) return false;
+		gpgme_signature_t sig = result->signatures;
+		if (!sig) return false;
+
+		for (; sig; sig = sig->next) {
+			if ((sig->summary & GPGME_SIGSUM_VALID) || (sig->summary & GPGME_SIGSUM_GREEN)) {  // Valid
+				return true;
+			}
+		}
+		return false;
+	}
+	catch(std::exception e) {
+		return false;
+	}
+}
+
+
+
 std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> c_gpgme::load_file ( const std::string &filename ) {
 	auto deleter = [](gpgme_data_t *ptr) {
 		gpgme_data_release(*ptr);
 		delete ptr;
 	};
-
 	std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> data_file_ptr(new gpgme_data_t, deleter);
 #ifdef __linux__ // TODO windows
 	int file_descriptor = open(filename.c_str(), O_RDONLY);
