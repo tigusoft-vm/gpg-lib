@@ -23,7 +23,7 @@ class c_gpgme
 		/**
 		 * Verify signed message from @param sig_file and save clear data to @param output_data_file
 		 */
-		bool verify_clearsign_file(const std::string &sig_file, const std::string &output_data_file);
+		//bool verify_clearsign_file(const std::string &sig_file, const std::string &output_data_file);
 
 		~c_gpgme();
 	private:

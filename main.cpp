@@ -18,6 +18,8 @@
 #include <errno.h>   /* errno             */
 #include <locale.h>  /* locale support    */
 
+#include "c_gpgme.hpp"
+
 #define SIZE 1024
 
 /* USE -D_FILE_OFFSET_BITS=64 (at least) on Debian!  */
@@ -62,6 +64,10 @@ bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
 
 int main()
 {
+	c_gpgme gpgme;
+	std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt") << std::endl;
+	return 0;
+////////////////////////////////////////////////////////
 	gpgme_ctx_t ctx = NULL;
 	gpgme_error_t ec;
 

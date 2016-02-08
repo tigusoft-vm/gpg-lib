@@ -9,7 +9,6 @@ c_gpgme::c_gpgme() {
 	gpgme_set_locale(NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
 	gpgme_check_version(NULL);
 	m_error_code = gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP);
-
 	m_error_code = gpgme_new(&m_ctx);
 	assert(m_ctx != nullptr);
 }
@@ -37,7 +36,6 @@ bool c_gpgme::verify_detached_signature ( const std::string &sig_file, const std
 		return false;
 	}
 }
-
 
 
 std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> c_gpgme::load_file ( const std::string &filename ) {
