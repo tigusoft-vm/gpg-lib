@@ -14,6 +14,9 @@ c_gpgme::c_gpgme() {
 	m_error_code = gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP);
 	m_error_code = gpgme_new(&m_ctx);
 	assert(m_ctx != nullptr);
+	m_error_code = gpgme_ctx_set_engine_info (m_ctx, GPGME_PROTOCOL_OpenPGP,
+               "./gpg", nullptr);
+	dbg("error " << m_error_code);
 }
 
 
