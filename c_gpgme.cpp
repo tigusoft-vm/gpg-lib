@@ -78,6 +78,42 @@ std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> c_gpgme::load
 }
 
 
+void c_gpgme::remove_key_from_keyring ( const std::string &fingerprint ) {
+	gpgme_key_t *key = nullptr;
+	m_error_code = gpgme_get_key(m_ctx, fingerprint.c_str(), key, 0);
+	if (m_error_code == GPG_ERR_EOF) {
+		throw std::runtime_error("Key is not found in the keyring");
+	}
+	else if (m_error_code == GPG_ERR_INV_VALUE) {
+		throw std::runtime_error("Ctx or r_key is not a valid pointer or fpr is not a fingerprint or key ID");
+	}
+	else if (m_error_code == GPG_ERR_AMBIGUOUS_NAME) {
+		throw std::runtime_error("key ID was not a unique specifier for a key");
+	}
+	else if (m_error_code == GPG_ERR_ENOMEM) {
+		throw std::runtime_error("not enough memory available");
+	}
+	assert(m_error_code == GPG_ERR_NO_ERROR);
+	assert(key != nullptr);
+
+	m_error_code = gpgme_op_delete(m_ctx, *key, 0);
+	if (m_error_code == GPG_ERR_INV_VALUE) {
+		throw std::runtime_error("ctx or key is not a valid pointer");
+	}
+	else if (m_error_code == GPG_ERR_NO_PUBKEY) {
+		throw std::runtime_error("key could not be found in the keyring");
+	}
+	else if (m_error_code == GPG_ERR_AMBIGUOUS_NAME) {
+		throw std::runtime_error("key was not specified unambiguously");
+	}
+	else if (m_error_code == GPG_ERR_CONFLICT) {
+		throw std::runtime_error("secret key for key is available, but allow_secret is zero");
+	}
+
+	assert(m_error_code == GPG_ERR_NO_ERROR);
+}
+
+
 void c_gpgme::load_public_key ( const std::string &filename ) {
 	auto key_file_ptr = load_file(filename);
 	m_error_code = gpgme_op_import(m_ctx, *key_file_ptr);

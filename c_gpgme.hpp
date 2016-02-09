@@ -25,13 +25,21 @@ class c_gpgme
 		 */
 		//bool verify_clearsign_file(const std::string &sig_file, const std::string &output_data_file);
 
+		/**
+		 * Load public key from @param filename to crypto engine keyring
+		 */
 		void load_public_key(const std::string &filename);
+
+		/**
+		 * Remove key from keyring
+		 */
+		void remove_key_from_keyring(const std::string &fingerprint);
 		~c_gpgme();
 	private:
 		gpgme_ctx_t m_ctx = nullptr;
 		gpgme_error_t m_error_code;
 
-		void release_data_t(gpgme_data_t *ptr);
+		//void release_data_t(gpgme_data_t *ptr);
 		std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> load_file(const std::string &filename);
 };
 
