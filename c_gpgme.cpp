@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <fcntl.h>
+#include <iostream>
 #include <stdexcept>
 
 // TODO delete me
