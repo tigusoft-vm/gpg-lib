@@ -66,7 +66,7 @@ int main()
 {
 	c_gpgme gpgme;
 	gpgme.load_public_key("key.pub");
-	std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt") << std::endl;
+	std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt", "CD439C3A7C0086209A65EFE1DB2B3B9D760BB820") << std::endl;
 	return 0;
 ////////////////////////////////////////////////////////
 	gpgme_ctx_t ctx = NULL;

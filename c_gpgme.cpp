@@ -31,7 +31,7 @@ c_gpgme::c_gpgme() {
 }
 
 
-bool c_gpgme::verify_detached_signature ( const std::string &sig_file, const std::string &clear_data_file ) {
+bool c_gpgme::verify_detached_signature ( const std::string &sig_file, const std::string &clear_data_file, const std::string &expected_fpr ) {
 	try {
 		auto sig_file_ptr = load_file(sig_file);
 		auto clear_data_file_ptr = load_file(clear_data_file);
@@ -44,10 +44,12 @@ bool c_gpgme::verify_detached_signature ( const std::string &sig_file, const std
 
 		for (; sig; sig = sig->next) {
 			if ((sig->summary & GPGME_SIGSUM_VALID) || (sig->summary & GPGME_SIGSUM_GREEN)) {  // Valid
-				return true;
+				if (expected_fpr == sig->fpr) return true;
+				else return false;
 			}
 			else if (sig->summary == 0 && sig->status == GPG_ERR_NO_ERROR) { // Valid but key is not certified with a trusted signature
-				return true;
+				if (expected_fpr == sig->fpr) return true;
+				else return false;
 			}
 		}
 		return false;

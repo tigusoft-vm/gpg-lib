@@ -18,7 +18,7 @@ class c_gpgme
 		 * Verify signed message. @param sig_file is detached signature file (gpg --detach-sign)
 		 * @param clear_data_file is signed clear data filename.
 		 */
-		bool verify_detached_signature(const std::string &sig_file, const std::string &clear_data_file);
+		bool verify_detached_signature(const std::string &sig_file, const std::string &clear_data_file, const std::string &expected_fpr);
 
 		/**
 		 * Verify signed message from @param sig_file and save clear data to @param output_data_file
@@ -33,7 +33,6 @@ class c_gpgme
 
 		void release_data_t(gpgme_data_t *ptr);
 		std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> load_file(const std::string &filename);
-
 };
 
 #endif // C_GPGME_H
