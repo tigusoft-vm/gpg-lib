@@ -19,13 +19,15 @@ std::string to_string(T val) {
 
 c_gpgme::c_gpgme() {
 	setlocale (LC_ALL, "");
-	gpgme_set_locale(NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
-	gpgme_check_version(NULL);
+	gpgme_set_locale(nullptr, LC_CTYPE, setlocale (LC_CTYPE, nullptr));
+	gpgme_check_version(nullptr);
 	m_error_code = gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP);
 	m_error_code = gpgme_new(&m_ctx);
 	assert(m_ctx != nullptr);
+#ifdef __CYGWIN__
 	m_error_code = gpgme_ctx_set_engine_info (m_ctx, GPGME_PROTOCOL_OpenPGP,
-               "./gpg", nullptr);
+               "./gpg.exe", nullptr);
+#endif
 }
 
 
