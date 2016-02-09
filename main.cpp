@@ -31,7 +31,7 @@ bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
 	dbg("load_public_key start");
 	//gpgme_set_armor(ctx, 1); // XXX
 	gpgme_error_t ec;
-	gpgme_data_t data_file = NULL;
+	gpgme_data_t data_file = nullptr;
 	int dataFileDescriptor = open(key_filename.c_str(), O_RDONLY);
 	ec = gpgme_data_new_from_fd(&data_file, dataFileDescriptor);
 	dbg("error " << ec);
@@ -64,9 +64,9 @@ bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
 
 int main()
 {
-	c_gpgme gpgme;
-	std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt") << std::endl;
-	return 0;
+	//c_gpgme gpgme;
+	//std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt") << std::endl;
+	//return 0;
 ////////////////////////////////////////////////////////
 	gpgme_ctx_t ctx = NULL;
 	gpgme_error_t ec;

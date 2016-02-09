@@ -44,17 +44,26 @@ std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> c_gpgme::load
 		delete ptr;
 	};
 	std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> data_file_ptr(new gpgme_data_t, deleter);
-#ifdef __linux__ // TODO windows
+//#ifdef __linux__ // TODO windows
 	int file_descriptor = open(filename.c_str(), O_RDONLY);
 	if (file_descriptor == -1) {
 		throw std::runtime_error(std::string("cannot open file ") + filename);
 	}
-#endif
+//#endif
 	m_error_code = gpgme_data_new_from_fd(data_file_ptr.get(), file_descriptor);
 	if (m_error_code) {
 		throw std::runtime_error(std::string("load file error, error code ") + std::to_string(m_error_code));
 	}
 	return data_file_ptr;
+}
+
+
+void c_gpgme::load_public_key ( const std::string &filename ) {
+	gpgme_data_t data_file = nullptr;
+	int dataFileDescriptor = open(filename.c_str(), O_RDONLY);
+	m_error_code = gpgme_data_new_from_fd(&data_file, dataFileDescriptor);
+	m_error_code = gpgme_op_import(m_ctx, data_file);
+	gpgme_data_release(data_file);
 }
 
 
