@@ -13,10 +13,10 @@
  */
 
 #include <gpgme.h>   /* gpgme             */
-#include <stdio.h>   /* printf            */
-#include <unistd.h>  /* write             */
-#include <errno.h>   /* errno             */
-#include <locale.h>  /* locale support    */
+//#include <stdio.h>   /* printf            */
+//#include <unistd.h>  /* write             */
+//#include <errno.h>   /* errno             */
+//#include <locale.h>  /* locale support    */
 
 #include "c_gpgme.hpp"
 
@@ -65,6 +65,7 @@ bool load_public_key(const std::string &key_filename, gpgme_ctx_t &ctx) {
 int main()
 {
 	c_gpgme gpgme;
+	gpgme.load_public_key("key.pub");
 	std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt") << std::endl;
 	return 0;
 ////////////////////////////////////////////////////////

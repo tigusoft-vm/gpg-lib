@@ -25,6 +25,7 @@ class c_gpgme
 		 */
 		//bool verify_clearsign_file(const std::string &sig_file, const std::string &output_data_file);
 
+		void load_public_key(const std::string &filename);
 		~c_gpgme();
 	private:
 		gpgme_ctx_t m_ctx = nullptr;
