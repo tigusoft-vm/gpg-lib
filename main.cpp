@@ -66,7 +66,9 @@ int main()
 {
 	c_gpgme gpgme;
 	gpgme.load_public_key("key.pub");
+	gpgme.load_public_key("tor-pub.key");
 	std::cout << std::boolalpha << gpgme.verify_detached_signature("test.txt.sig", "test.txt", "CD439C3A7C0086209A65EFE1DB2B3B9D760BB820") << std::endl;
+	//gpgme.remove_key_from_keyring("EF6E286DDA85EA2A4BA7DE684E2C6E8793298290");
 	return 0;
 ////////////////////////////////////////////////////////
 	gpgme_ctx_t ctx = NULL;

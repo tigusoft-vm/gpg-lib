@@ -79,8 +79,8 @@ std::unique_ptr<gpgme_data_t, std::function<void(gpgme_data_t *)>> c_gpgme::load
 
 
 void c_gpgme::remove_key_from_keyring ( const std::string &fingerprint ) {
-	gpgme_key_t *key = nullptr;
-	m_error_code = gpgme_get_key(m_ctx, fingerprint.c_str(), key, 0);
+	gpgme_key_t key;
+	m_error_code = gpgme_get_key(m_ctx, fingerprint.c_str(), &key, 0);
 	if (m_error_code == GPG_ERR_EOF) {
 		throw std::runtime_error("Key is not found in the keyring");
 	}
@@ -93,10 +93,10 @@ void c_gpgme::remove_key_from_keyring ( const std::string &fingerprint ) {
 	else if (m_error_code == GPG_ERR_ENOMEM) {
 		throw std::runtime_error("not enough memory available");
 	}
-	assert(m_error_code == GPG_ERR_NO_ERROR);
-	assert(key != nullptr);
 
-	m_error_code = gpgme_op_delete(m_ctx, *key, 0);
+	assert(m_error_code == GPG_ERR_NO_ERROR);
+
+	m_error_code = gpgme_op_delete(m_ctx, key, 0);
 	if (m_error_code == GPG_ERR_INV_VALUE) {
 		throw std::runtime_error("ctx or key is not a valid pointer");
 	}
