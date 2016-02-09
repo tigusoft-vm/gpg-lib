@@ -8,6 +8,18 @@
 // TODO delete me
 #define dbg(X) std::cout << __LINE__ << ": " << X << std::endl
 
+#ifdef __CYGWIN__
+#include <sstream>
+namespace std {
+template <typename T>
+std::string to_string(T val) {
+    std::stringstream stream;
+    stream << val;
+    return stream.str();
+}
+} // namespace std
+#endif
+
 c_gpgme::c_gpgme() {
 	setlocale (LC_ALL, "");
 	gpgme_set_locale(NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
