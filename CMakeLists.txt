@@ -7,7 +7,11 @@ add_subdirectory(test)
 
 add_library(c_gpgme c_gpgme.cpp)
 add_executable(gpg_example main.cpp)
-target_link_libraries(gpg_example gpgme c_gpgme)
+target_link_libraries(gpg_example
+						gpgme
+						c_gpgme
+						boost_system
+						boost_filesystem)
 
 add_custom_target(unit_test
         COMMAND ./run_tests

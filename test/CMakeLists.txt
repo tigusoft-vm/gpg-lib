@@ -9,4 +9,6 @@ target_link_libraries(run_tests
 						gtest
 						gtest_main
 						c_gpgme
-						gpgme)
+						gpgme
+						boost_filesystem
+						boost_system)
