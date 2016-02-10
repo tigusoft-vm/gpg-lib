@@ -9,3 +9,7 @@ add_library(c_gpgme c_gpgme.cpp)
 add_executable(gpg_example main.cpp)
 target_link_libraries(gpg_example gpgme c_gpgme)
 
+add_custom_target(unit_test
+        COMMAND ./run_tests
+        DEPENDS test/run_tests
+        WORKING_DIRECTORY ./test)
