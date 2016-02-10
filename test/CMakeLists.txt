@@ -8,4 +8,5 @@ add_executable(run_tests ${TEST_SOURCE_FILES})
 target_link_libraries(run_tests
 						gtest
 						gtest_main
-						c_gpgme)
+						c_gpgme
+						gpgme)

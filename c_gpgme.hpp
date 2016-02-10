@@ -34,6 +34,7 @@ class c_gpgme
 		 * Remove key from keyring
 		 */
 		void remove_key_from_keyring(const std::string &fingerprint);
+		gpgme_error_t get_last_error();
 		~c_gpgme();
 	private:
 		gpgme_ctx_t m_ctx = nullptr;

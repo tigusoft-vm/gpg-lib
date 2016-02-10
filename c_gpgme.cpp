@@ -120,6 +120,11 @@ void c_gpgme::load_public_key ( const std::string &filename ) {
 }
 
 
+gpgme_error_t c_gpgme::get_last_error() {
+	return m_error_code;
+}
+
+
 c_gpgme::~c_gpgme() {
 	gpgme_release(m_ctx);
 }
